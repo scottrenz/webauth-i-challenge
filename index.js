@@ -121,11 +121,32 @@ server.get('/api/users', (req, res) => {
     })
     .catch(err => res.send(err));
 });
+
 server.get('/api/restricted/users', restricted, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
     })
+    .catch(err => res.send(err));
+});
+
+server.delete('/api/restricted/users/:id', restricted, (req, res) => {
+  db.raw('select count(id) as [count] from users where id ='+req.params.id)
+  .then(count => {
+    console.log('count',count)
+if(count[0]['count'] === 1)
+{
+      db.raw('delete from users where id='+req.params.id)
+    .then(users => {
+      res.json('deleted user id '+req.params.id);
+    })
+    .catch(err => res.send(err));
+  }
+  else
+  {
+    res.status(500).json('not found');
+  }
+  })
     .catch(err => res.send(err));
 });
 
