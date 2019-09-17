@@ -114,7 +114,14 @@ server.post('/api/login', (req, res) => {
     });
 });
 
-server.get('/api/users', restricted, (req, res) => {
+server.get('/api/users', (req, res) => {
+  Users.find()
+    .then(users => {
+      res.json(users);
+    })
+    .catch(err => res.send(err));
+});
+server.get('/api/restricted/users', restricted, (req, res) => {
   Users.find()
     .then(users => {
       res.json(users);
