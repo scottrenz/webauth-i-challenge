@@ -115,7 +115,7 @@ server.post('/api/login', (req, res) => {
 });
 
 server.get('/api/users', (req, res) => {
-  Users.find()
+  db.raw("select id, username from users where username not like '#%'")
     .then(users => {
       res.json(users);
     })
