@@ -87,7 +87,7 @@ server.post('/api/register', (req, res) => {
       res.status(201).json(saved);
     })
     .catch(error => {
-      res.status(500).json(error);
+      res.status(500).json(error+'');
     });
   });
 
@@ -101,7 +101,6 @@ server.post('/api/login', (req, res) => {
       bcrypt.compareSync(password, user.password)
       if (user &&  bcrypt.compareSync(password, user.password))
        {
-         console.log('user',user)
         req.session.user = user; 
         res.status(200).json({ message: `Logged in ${user.username} ${user.id}!` });
       }
@@ -111,7 +110,7 @@ server.post('/api/login', (req, res) => {
       }
     })
     .catch(error => {
-      res.status(500).json(error);
+      res.status(500).json("I don't know you!");
     });
 });
 
