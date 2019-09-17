@@ -13,6 +13,23 @@ server.use(helmet());
 server.use(express.json());
 server.use(cors());
 
+const session = require('express-session');
+
+// configure express-session middleware
+server.use(
+  session({
+    name: 'notsession', // default is connect.sid
+    secret: 'nobody tosses a dwarf!',
+    cookie: {
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+      secure: false, // true in production, only set cookies over https. Server will not send back a cookie over http.
+    }, // 1 day in milliseconds
+    httpOnly: true, // don't let JS code access cookies. Browser extensions run JS code on your browser!
+    resave: false,
+    saveUninitialized: false, // GDPR law against saving cookies automatically
+  })
+);
+
 function restricted(req, res, next) {
   // we'll read the username and password from headers
   // the client is responsible for setting those headers
@@ -63,10 +80,14 @@ server.post('/api/login', (req, res) => {
     .then(user => {
       // check password
       bcrypt.compareSync(password, user.password)
-      if (user) {
-        res.status(200).json({ message: `Welcome ${user.username}!` });
-      } else {
-        res.status(401).json({ message: 'Invalid Credentials' });
+      if (user &&  bcrypt.compareSync(password, user.password))
+       {
+        req.session.user = user; 
+        res.status(200).json({ message: `Logged in ${user.username} ${user.id}!` });
+      }
+       else
+        {
+        res.status(401).json({ message: 'You shall not pass' });
       }
     })
     .catch(error => {
